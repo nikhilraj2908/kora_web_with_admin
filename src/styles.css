@@ -1,0 +1,203 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-cream: var(--cream);
+  --color-coral: var(--coral);
+  --color-marigold: var(--marigold);
+  --color-ink: var(--ink);
+  --color-mint: var(--mint);
+  --color-bubble: var(--bubble);
+  --color-electric: var(--electric);
+  --color-sunset: var(--sunset);
+  --font-display: "Space Grotesk", sans-serif;
+  --font-sans: "DM Sans", sans-serif;
+}
+
+:root, .light {
+  --radius: 1.25rem;
+  /* Kora Teal — light */
+  --cream: #F2FBFA;
+  --coral: #FF6B5B;
+  --marigold: #F5A524;
+  --ink: #062126;
+  --mint: #14B8A6;
+  --bubble: #C9F2EC;
+
+  --background: #F2FBFA;
+  --foreground: #062126;
+  --card: #FFFFFF;
+  --card-foreground: #062126;
+  --popover: #FFFFFF;
+  --popover-foreground: #062126;
+  --primary: #0E7C7B;
+  --primary-foreground: #FFFFFF;
+  --secondary: #D6F3EE;
+  --secondary-foreground: #062126;
+  --muted: #E6F4F2;
+  --muted-foreground: #4B6B6E;
+  --accent: #14B8A6;
+  --accent-foreground: #062126;
+  --destructive: oklch(0.65 0.25 25);
+  --destructive-foreground: #FFFFFF;
+  --border: rgba(6, 33, 38, 0.08);
+  --input: rgba(6, 33, 38, 0.12);
+  --ring: #14B8A6;
+  --electric: #2DD4BF;
+  --sunset: #FF6B5B;
+
+  --glass-bg-from: rgba(255, 255, 255, 0.85);
+  --glass-bg-to: rgba(214, 243, 238, 0.55);
+  --glass-border: rgba(6, 33, 38, 0.08);
+  --shadow-soft: 0 18px 50px -20px rgba(14, 124, 123, 0.35), 0 8px 24px -12px rgba(6, 33, 38, 0.12);
+}
+
+.dark {
+  /* Kora Teal — dark, matches logo */
+  --cream: #04181C;
+  --coral: #FF8A7A;
+  --marigold: #FBBF24;
+  --ink: #E8FBF7;
+  --mint: #2DD4BF;
+  --bubble: #0F3A40;
+
+  --background: #04181C;
+  --foreground: #E8FBF7;
+  --card: #0A2A2F;
+  --card-foreground: #E8FBF7;
+  --popover: #0A2A2F;
+  --popover-foreground: #E8FBF7;
+  --primary: #2DD4BF;
+  --primary-foreground: #04181C;
+  --secondary: #0F3A40;
+  --secondary-foreground: #E8FBF7;
+  --muted: #0A2A2F;
+  --muted-foreground: #8FB5B5;
+  --accent: #FF8A7A;
+  --accent-foreground: #04181C;
+  --destructive: oklch(0.65 0.25 25);
+  --destructive-foreground: #FFFFFF;
+  --border: rgba(232, 251, 247, 0.10);
+  --input: rgba(232, 251, 247, 0.14);
+  --ring: #2DD4BF;
+  --electric: #5EEAD4;
+  --sunset: #FF8A7A;
+  --glass-bg-from: rgba(45, 212, 191, 0.08);
+  --glass-bg-to: rgba(255, 255, 255, 0.02);
+  --glass-border: rgba(45, 212, 191, 0.18);
+  --shadow-soft: 0 18px 50px -20px rgba(45, 212, 191, 0.35), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.025em; }
+}
+
+@utility glass {
+  background: linear-gradient(135deg, var(--glass-bg-from), var(--glass-bg-to));
+  backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--glass-border);
+}
+
+@utility soft-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+}
+
+@utility gradient-text {
+  background: linear-gradient(135deg, var(--mint), var(--electric), var(--coral));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility gradient-hero {
+  background: linear-gradient(135deg, #0E7C7B, #14B8A6 55%, #2DD4BF);
+}
+
+@utility gradient-bubble {
+  background: linear-gradient(135deg, var(--bubble), var(--mint));
+}
+
+@utility glow-primary {
+  box-shadow: 0 20px 60px -10px color-mix(in oklab, var(--coral) 50%, transparent),
+              0 0 60px color-mix(in oklab, var(--marigold) 25%, transparent);
+}
+
+@utility noise-bg {
+  background-image:
+    radial-gradient(at 20% 10%, color-mix(in oklab, var(--marigold) 25%, transparent) 0, transparent 50%),
+    radial-gradient(at 80% 0%, color-mix(in oklab, var(--coral) 25%, transparent) 0, transparent 50%),
+    radial-gradient(at 0% 50%, color-mix(in oklab, var(--mint) 20%, transparent) 0, transparent 50%);
+}
+
+@keyframes blob {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -50px) scale(1.1); }
+  66% { transform: translate(-30px, 30px) scale(0.9); }
+}
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes shake {
+  0%, 100% { transform: translate(0,0) rotate(0); }
+  20% { transform: translate(-2px, 1px) rotate(-1deg); }
+  40% { transform: translate(3px, -1px) rotate(1.2deg); }
+  60% { transform: translate(-2px, 2px) rotate(-1deg); }
+  80% { transform: translate(2px, 0) rotate(0.6deg); }
+}
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@utility animate-blob { animation: blob 14s ease-in-out infinite; }
+@utility animate-float { animation: float-y 4s ease-in-out infinite; }
+@utility animate-shake { animation: shake 1.6s ease-in-out infinite; }
+@utility animate-spin-slow { animation: spin-slow 8s linear infinite; }
+@utility animate-marquee { animation: marquee 40s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
