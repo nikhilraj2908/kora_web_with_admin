@@ -9,6 +9,8 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
+const ADMIN_SHORTCUT_KEYS = new Set([",", "<", "+", "=", "-", "_"]);
+
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
@@ -130,6 +132,23 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleShortcut = (event: KeyboardEvent) => {
+      const isModifierPressed = event.ctrlKey || event.metaKey;
+      const key = event.key;
+      const isAdminShortcut = isModifierPressed && ADMIN_SHORTCUT_KEYS.has(key);
+
+      if (!isAdminShortcut || event.defaultPrevented) return;
+
+      event.preventDefault();
+      void router.navigate({ to: "/admin/login" });
+    };
+
+    window.addEventListener("keydown", handleShortcut);
+    return () => window.removeEventListener("keydown", handleShortcut);
+  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>
