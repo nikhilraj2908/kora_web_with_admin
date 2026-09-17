@@ -186,7 +186,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
     );
   }
 
-  if (status === "unauthenticated") return <Navigate to="/admin/login" />;
+  if (status === "unauthenticated") return <Navigate to="/" />;
 
   if ((pathname === "/admin" || pathname === "/admin/") && !hasPermission("dashboard.view")) {
     const firstAllowed = getAdminDefaultRoute(profile);

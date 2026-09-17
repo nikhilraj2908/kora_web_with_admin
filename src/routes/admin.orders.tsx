@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Eye, Search, Trash2 } from "lucide-react";
+import { Eye, Search } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { AdminPageHeader, EmptyPanel, ErrorPanel, LoadingPanel, PaginationBar, StatusBadge, formatCurrency, formatDate } from "@/components/admin/AdminCommon";
@@ -124,7 +124,6 @@ function OrdersPage() {
                       <TableCell>
                         <div className="flex justify-end gap-1">
                           <Button size="icon" variant="ghost" onClick={() => setSelectedId(order._id)}><Eye /><span className="sr-only">View order</span></Button>
-                          {isSuperAdmin ? <Button size="icon" variant="ghost" className="text-destructive" onClick={() => void removeOrder(order)}><Trash2 /><span className="sr-only">Delete order</span></Button> : null}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -241,7 +240,6 @@ function OrderDetail({ order, canManage, isSuperAdmin, onChanged, onDelete }: { 
         </section>
       ) : null}
 
-      {isSuperAdmin ? <Button variant="destructive" className="w-full" onClick={onDelete}><Trash2 /> Delete order permanently</Button> : null}
     </div>
   );
 }

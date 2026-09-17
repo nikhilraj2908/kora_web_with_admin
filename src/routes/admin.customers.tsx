@@ -8,6 +8,7 @@ import { useAdminAuth } from "@/components/admin/AdminAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -28,6 +29,7 @@ function CustomersPage() {
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedCustomerIds, setSelectedCustomerIds] = useState<string[]>([]);
 
   useEffect(() => {
     const id = window.setTimeout(() => {
@@ -63,9 +65,24 @@ function CustomersPage() {
       await adminApi.deleteCustomer(customer._id);
       toast.success("Customer deleted");
       if (selectedId === customer._id) setSelectedId(null);
+      setSelectedCustomerIds((current) => current.filter((id) => id !== customer._id));
       await refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Delete failed");
+    }
+  }
+
+  async function removeSelected() {
+    if (!selectedCustomerIds.length) return;
+    if (!window.confirm(`Delete ${selectedCustomerIds.length} selected customer${selectedCustomerIds.length > 1 ? "s" : ""}? This cannot be undone.`)) return;
+    try {
+      await Promise.all(selectedCustomerIds.map((id) => adminApi.deleteCustomer(id)));
+      toast.success(`${selectedCustomerIds.length} customer${selectedCustomerIds.length > 1 ? "s" : ""} deleted`);
+      setSelectedCustomerIds([]);
+      setSelectedId(null);
+      await refresh();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Bulk delete failed");
     }
   }
 
@@ -84,19 +101,63 @@ function CustomersPage() {
 
         {listQuery.isLoading ? <div className="p-4"><LoadingPanel /></div> : listQuery.isError ? <div className="p-4"><ErrorPanel message={listQuery.error.message} /></div> : !listQuery.data?.customers?.length ? <div className="p-4"><EmptyPanel message="No customers found." /></div> : (
           <>
+            {selectedCustomerIds.length > 0 ? (
+              <div className="flex items-center justify-between border-b bg-muted/30 px-4 py-3">
+                <p className="text-sm font-medium">{selectedCustomerIds.length} selected</p>
+                <Button variant="destructive" size="sm" onClick={() => void removeSelected()}>
+                  <Trash2 className="mr-2 h-4 w-4" /> Delete selected
+                </Button>
+              </div>
+            ) : null}
             <Table>
-              <TableHeader><TableRow><TableHead>Customer</TableHead><TableHead>Contact</TableHead><TableHead>Addresses</TableHead><TableHead>Account</TableHead><TableHead>Joined</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-12">
+                    <Checkbox
+                      checked={Boolean(listQuery.data.customers.length) && selectedCustomerIds.length === listQuery.data.customers.length}
+                      onCheckedChange={(checked) => {
+                        if (checked === true) {
+                          setSelectedCustomerIds(Array.from(new Set([...selectedCustomerIds, ...listQuery.data.customers.map((customer) => customer._id)])));
+                        } else {
+                          setSelectedCustomerIds([]);
+                        }
+                      }}
+                      aria-label="Select all customers"
+                    />
+                  </TableHead>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Addresses</TableHead>
+                  <TableHead>Account</TableHead>
+                  <TableHead>Joined</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
               <TableBody>
-                {listQuery.data.customers.map((customer) => (
-                  <TableRow key={customer._id}>
-                    <TableCell><div className="flex items-center gap-3"><Avatar className="h-9 w-9"><AvatarImage src={absoluteUploadUrl(customer.profilePhoto)} /><AvatarFallback>{customer.fullName?.slice(0, 2).toUpperCase() || "CU"}</AvatarFallback></Avatar><div><p className="font-semibold">{customer.fullName || "Unnamed customer"}</p><p className="text-xs text-muted-foreground">{customer._id}</p></div></div></TableCell>
-                    <TableCell><p className="text-sm">{customer.phone || customer.accountId?.mobile || "—"}</p><p className="text-xs text-muted-foreground">{customer.accountId?.email || "—"}</p></TableCell>
-                    <TableCell><p className="text-sm font-medium">{customer.addresses?.length ?? 0} saved</p><p className="max-w-52 truncate text-xs text-muted-foreground">{customer.addresses?.[0]?.city || "No city"}</p></TableCell>
-                    <TableCell><StatusBadge status={customer.accountId?.isVerified ? "verified" : "pending"} /></TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{formatDate(customer.createdAt)}</TableCell>
-                    <TableCell><div className="flex justify-end gap-1"><Button size="icon" variant="ghost" onClick={() => setSelectedId(customer._id)}><Eye /><span className="sr-only">View</span></Button>{isSuperAdmin ? <Button size="icon" variant="ghost" className="text-destructive" onClick={() => void remove(customer)}><Trash2 /><span className="sr-only">Delete</span></Button> : null}</div></TableCell>
-                  </TableRow>
-                ))}
+                {listQuery.data.customers.map((customer) => {
+                  const selected = selectedCustomerIds.includes(customer._id);
+                  return (
+                    <TableRow key={customer._id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selected}
+                          onCheckedChange={(checked) => {
+                            setSelectedCustomerIds((current) =>
+                              checked === true ? Array.from(new Set([...current, customer._id])) : current.filter((id) => id !== customer._id),
+                            );
+                          }}
+                          aria-label={`Select ${customer.fullName || "customer"}`}
+                        />
+                      </TableCell>
+                      <TableCell><div className="flex items-center gap-3"><Avatar className="h-9 w-9"><AvatarImage src={absoluteUploadUrl(customer.profilePhoto)} /><AvatarFallback>{customer.fullName?.slice(0, 2).toUpperCase() || "CU"}</AvatarFallback></Avatar><div><p className="font-semibold">{customer.fullName || "Unnamed customer"}</p><p className="text-xs text-muted-foreground">{customer._id}</p></div></div></TableCell>
+                      <TableCell><p className="text-sm">{customer.phone || customer.accountId?.mobile || "—"}</p><p className="text-xs text-muted-foreground">{customer.accountId?.email || "—"}</p></TableCell>
+                      <TableCell><p className="text-sm font-medium">{customer.addresses?.length ?? 0} saved</p><p className="max-w-52 truncate text-xs text-muted-foreground">{customer.addresses?.[0]?.city || "No city"}</p></TableCell>
+                      <TableCell><StatusBadge status={customer.accountId?.isVerified ? "verified" : "pending"} /></TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{formatDate(customer.createdAt)}</TableCell>
+                      <TableCell><div className="flex justify-end gap-1"><Button size="icon" variant="ghost" onClick={() => setSelectedId(customer._id)}><Eye /><span className="sr-only">View</span></Button>{isSuperAdmin ? <Button size="icon" variant="ghost" className="text-destructive" onClick={() => void remove(customer)}><Trash2 /><span className="sr-only">Delete</span></Button> : null}</div></TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
             <PaginationBar page={listQuery.data.page ?? page} totalPages={listQuery.data.totalPages ?? 1} total={listQuery.data.total} onPageChange={setPage} />
